@@ -145,8 +145,8 @@ class PID {
 
 // -------- Pin definitions --------
 // Motor A
-const int PWM_L1 = 2;
-const int PWM_L2 = 3;
+const int PWM_L1 = 9;
+const int PWM_L2 = 6;
 
 // Motor B
 const int PWM_R1 = 10;
@@ -178,15 +178,19 @@ void setup() {
 
 void loop() {
   goUS(10);
+  delay(1);
 }
 
 void goUS(int sp){
   long dist = radar.readCM();
-  Serial.println(dist);
-  int speed = -usPID.compute(dist, sp);
-        Serial.print("speed ="); Serial.println(speed);
-  motorL.setSpeed(speed);
-  motorR.setSpeed(speed);
+  if (dist > 0){
+    Serial.println(dist);
+    int speed = -usPID.compute(dist, sp);
+    Serial.print("speed ="); Serial.println(speed);
+    motorL.setSpeed(speed);
+    motorR.setSpeed(speed);
+  }
+  
 }
 void trackLine(int sp){
   int reflectedlight = lineSensor.readRaw();
