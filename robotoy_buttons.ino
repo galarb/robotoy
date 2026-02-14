@@ -261,7 +261,7 @@ const int TCRT_PIN = A0;
 const int ledspin = 4;
 const int NUMPIXELS = 2;
 
-int baseSpeed = 40; // for tracking line
+int baseSpeed = 80; // for tracking line
 
 char buf[5];   // 4 digits + null
 unsigned long lastDisplayUpdate = 0;
@@ -286,7 +286,7 @@ Motor motorR(PWM_R1, PWM_R2);
 Ultrasonic radar(TRIG_PIN, ECHO_PIN);
 TCRT5000 lineSensor(TCRT_PIN, 600);
 PID usPID(1.7, 0.7, 0.0);
-PID linePID(1.0, 0.0, 0.0);
+PID linePID(1.8, 1.0, 0.0);
 TM1650 d;
 IRQs buttons(2, 3);
 Adafruit_NeoPixel pixels(NUMPIXELS, ledspin, NEO_GRB + NEO_KHZ800);
@@ -339,11 +339,14 @@ void goUS(int sp){
   
 }
 void trackLine(int sp){
-  int reflectedlight = lineSensor.readRaw();
-  
+  int reflectedlight = lineSensor.readNormalized();
+  Serial.print("readNormalized =");   Serial.println(reflectedlight);
+
   int speed = linePID.compute(reflectedlight, sp);
+  Serial.print("speed PID =");   Serial.println(speed);
   motorR.setSpeed(baseSpeed+speed);
   motorL.setSpeed(baseSpeed-speed);
+  //delay(1000);
 }
 
 void displaymode() {
@@ -403,7 +406,7 @@ void activate() {
       break;
 
     case 2:
-      Serial.println("track mode");
+      //Serial.println("track mode");
       trackLine(50);
       pixels.setBrightness(100);
       pixels.setPixelColor(0, pixels.Color(0, 0, 255));
